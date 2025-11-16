@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Mini RAG Console</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link rel="stylesheet" href="rag_console.css" />
+</head>
+
+<body>
+  <h1>Mini RAG Console</h1>
+  <div class="subtitle">
+    Quick UI for <code>/ingest</code> and <code>/search</code> so you don’t have to open Swagger during demos.
+  </div>
+
+  <div class="small">
+    API base URL:
+    <code id="baseUrlDisplay">/</code>
+  </div>
+
+  <div class="panels">
+
+    <!-- INGEST PANEL -->
+    <div class="card" id="ingestCard">
+      <h2>Ingest</h2>
+
+      <label for="ingestText">Text</label>
+      <textarea id="ingestText"></textarea>
+
+      <label for="ingestMetadata">Metadata (JSON)</label>
+      <input id="ingestMetadata" type="text" placeholder='{"source": "demo"}' />
+
+      <div class="row">
+        <button id="ingestBtn" class="primary">Ingest</button>
+        <button id="ingestClearBtn">Clear</button>
+      </div>
+
+      <div id="ingestStatus" class="status"></div>
+      <pre id="ingestResult">{}</pre>
+    </div>
+
+    <!-- SEARCH PANEL -->
+    <div class="card" id="searchCard">
+      <h2>Search</h2>
+
+      <label for="searchQuery">Query</label>
+      <input id="searchQuery" type="text" placeholder="Ask something..." />
+
+      <div class="row">
+        <div>
+          <label for="searchTopK">Top K</label>
+          <input id="searchTopK" type="number" min="1" max="50" value="5" />
+        </div>
+        <div>
+          <label style="font-size: 0.8rem;">
+            <input id="searchIncludeMeta" type="checkbox" checked />
+            Include metadata
+          </label>
+        </div>
+      </div>
+
+      <div class="row">
+        <button id="searchBtn" class="primary">Search</button>
+        <button id="searchClearBtn">Clear</button>
+      </div>
+
+      <div id="searchStatus" class="status"></div>
+      <pre id="searchResult">{}</pre>
+    </div>
+
+  </div>
+
+  <script src="rag_console.js"></script>
+</body>
+</html>

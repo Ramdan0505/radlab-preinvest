@@ -1,0 +1,19 @@
+# Python venv
+.venv/
+venv/
+
+# Bytecode
+__pycache__/
+*.pyc
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Editor junk
+.idea/
+.vscode/
+
+# Docker artifacts
+*.pid
+logs/
