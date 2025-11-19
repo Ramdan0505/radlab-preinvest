@@ -7,8 +7,10 @@ services:
       - "8000:8000"
     volumes:
       - ./data:/data
+      - ./static:/app/static:ro      
     environment:
       - ARTIFACT_DIR=/data/artifacts
+
 
   chroma:
     image: ghcr.io/chroma-core/chroma:latest
