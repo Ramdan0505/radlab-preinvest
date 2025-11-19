@@ -8,6 +8,7 @@ from typing import Any, Dict, Optional
 
 from fastapi import FastAPI, UploadFile, BackgroundTasks, Query
 from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
