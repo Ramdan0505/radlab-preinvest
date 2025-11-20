@@ -11,6 +11,17 @@ services:
     environment:
       - ARTIFACT_DIR=/data/artifacts
 
+  worker:
+    build:
+      context: .
+      dockerfile: worker/Dockerfile
+    volumes:
+      - ./data:/data
+    environment:
+      - ARTIFACT_DIR=/data/artifacts
+    depends_on:
+      - chroma
+
 
   chroma:
     image: ghcr.io/chroma-core/chroma:latest
