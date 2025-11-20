@@ -1,5 +1,5 @@
 // CONFIG
-const baseUrl = ""; // set to "/api" ONLY if your API is actually under that prefix
+const baseUrl = ""; // set to "/api" ONLY if your API is under that prefix
 document.getElementById("baseUrlDisplay").textContent = baseUrl || "/";
 
 async function callApi(path, options = {}) {
@@ -18,7 +18,6 @@ function pretty(obj) {
   return JSON.stringify(obj, null, 2);
 }
 
-// Keep last case id in memory so search can work without manual entry
 let lastCaseId = "";
 
 // INGEST
@@ -34,24 +33,23 @@ ingestBtn.addEventListener("click", async () => {
     return;
   }
 
+  // ---- FIXED SECTION ----
   let metadata;
-try {
+  try {
     metadata = metadataRaw ? JSON.parse(metadataRaw) : { source: "ui" };
-} catch {
+  } catch {
     status.textContent = "Invalid metadata JSON.";
     return;
-}
-
+  }
+  // ------------------------
 
   ingestBtn.disabled = true;
   status.textContent = "Ingesting...";
   result.textContent = "{}";
 
   try {
-    const body = { text };
-    if (metadata) body.metadata = metadata;
+    const body = { text, metadata };
 
-    // JSON ingest endpoint; backend will generate a case_id if absent
     const res = await callApi("/ingest", {
       method: "POST",
       body: JSON.stringify(body)
@@ -60,11 +58,8 @@ try {
     status.textContent = "Ingest OK.";
     result.textContent = pretty(res);
 
-    // Capture and display the case_id for subsequent searches
     if (res && res.case_id) {
       lastCaseId = res.case_id;
-      const caseInput = document.getElementById("caseId");
-      if (caseInput) caseInput.value = res.case_id;
     }
   } catch (err) {
     status.textContent = `Error: ${err.status ?? "?"}`;
@@ -74,12 +69,14 @@ try {
   }
 });
 
+// Clear button
 document.getElementById("ingestClearBtn").addEventListener("click", () => {
   document.getElementById("ingestText").value = "";
   document.getElementById("ingestMetadata").value = "";
   document.getElementById("ingestStatus").textContent = "";
   document.getElementById("ingestResult").textContent = "{}";
 });
+
 
 // SEARCH
 const searchBtn = document.getElementById("searchBtn");
@@ -90,16 +87,15 @@ searchBtn.addEventListener("click", async () => {
 
   const status = document.getElementById("searchStatus");
   const result = document.getElementById("searchResult");
-  const caseInput = document.getElementById("caseId");
 
-  const case_id = (caseInput && caseInput.value.trim()) || lastCaseId;
+  const case_id = lastCaseId;
 
   if (!query) {
     status.textContent = "Enter query.";
     return;
   }
   if (!case_id) {
-    status.textContent = "Missing case_id: ingest text first or enter a case id.";
+    status.textContent = "Missing case_id: ingest text first.";
     return;
   }
 
@@ -108,7 +104,6 @@ searchBtn.addEventListener("click", async () => {
   result.textContent = "{}";
 
   try {
-    // Backend ignores include_metadata in our current model, but it's harmless to include.
     const body = { case_id, query, top_k, include_metadata };
 
     const res = await callApi("/search", {
@@ -126,6 +121,7 @@ searchBtn.addEventListener("click", async () => {
   }
 });
 
+// Search clear
 document.getElementById("searchClearBtn").addEventListener("click", () => {
   document.getElementById("searchQuery").value = "";
   document.getElementById("searchResult").textContent = "{}";
