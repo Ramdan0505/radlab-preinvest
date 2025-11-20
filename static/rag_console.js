@@ -124,26 +124,31 @@ document.getElementById("searchClearBtn").addEventListener("click", () => {
 
 // CASE VIEWER
 const loadCasesBtn = document.getElementById("loadCasesBtn");
-const caseList = document.getElementById("caseList");
+const caseListDisplay = document.getElementById("caseListDisplay");
 const caseDetails = document.getElementById("caseDetails");
 
 loadCasesBtn.addEventListener("click", async () => {
-  caseList.textContent = "Loading...";
+  caseListDisplay.innerHTML = "Loading...";
+
   try {
     const res = await callApi("/cases");
-    caseList.textContent = pretty(res);
+    caseListDisplay.innerHTML = "";
 
-    // Click handler for selecting a case
-    caseList.onclick = async (evt) => {
-      const text = evt.target.textContent;
-      const match = text.match(/"case_id": "([^"]+)"/);
-      if (!match) return;
+    for (const c of res.cases) {
+      const li = document.createElement("li");
+      li.textContent = c.case_id;
+      li.style.cursor = "pointer";
+      li.style.color = "#22c55e";
 
-      const case_id = match[1];
-      const details = await callApi(`/cases/${case_id}`);
-      caseDetails.textContent = pretty(details);
-    };
+      li.onclick = async () => {
+        const details = await callApi(`/cases/${c.case_id}`);
+        caseDetails.textContent = pretty(details);
+      };
+
+      caseListDisplay.appendChild(li);
+    }
   } catch (err) {
-    caseList.textContent = pretty(err.body);
+    caseListDisplay.textContent = pretty(err.body);
   }
 });
+
