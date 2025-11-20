@@ -33,7 +33,7 @@ app.add_middleware(
 )
 
 # The path exists because we COPY static/ in Dockerfile and bind-mount in compose
-app.mount("/static", StaticFiles(directory="static"), name="static")
+
 
 ARTIFACT_DIR = os.environ.get("ARTIFACT_DIR", "/data/artifacts")
 
