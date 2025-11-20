@@ -1,3 +1,5 @@
+version: "3.9"
+
 services:
   api:
     build:
@@ -7,9 +9,12 @@ services:
       - "8000:8000"
     volumes:
       - ./data:/data
-      - ./static:/app/static:ro      
+      - ./static:/app/static
     environment:
-      - ARTIFACT_DIR=/data/artifacts
+      ARTIFACT_DIR: /data/artifacts
+    depends_on:
+      - chroma
+      - worker
 
   worker:
     build:
@@ -17,11 +22,6 @@ services:
       dockerfile: worker/Dockerfile
     volumes:
       - ./data:/data
-    environment:
-      - ARTIFACT_DIR=/data/artifacts
-    depends_on:
-      - chroma
-
 
   chroma:
     image: ghcr.io/chroma-core/chroma:latest
@@ -29,10 +29,6 @@ services:
       - "8001:8000"
     volumes:
       - ./chroma:/data
-    environment:
-      CHROMA_HOST: chroma
-      CHROMA_PORT: 8000
-
 
   minio:
     image: minio/minio
