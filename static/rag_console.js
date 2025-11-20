@@ -1,5 +1,5 @@
 // CONFIG
-const baseUrl = ""; // set to "/api" ONLY if your API is under that prefix
+const baseUrl = ""; 
 document.getElementById("baseUrlDisplay").textContent = baseUrl || "/";
 
 async function callApi(path, options = {}) {
@@ -33,7 +33,6 @@ ingestBtn.addEventListener("click", async () => {
     return;
   }
 
-  // ---- FIXED SECTION ----
   let metadata;
   try {
     metadata = metadataRaw ? JSON.parse(metadataRaw) : { source: "ui" };
@@ -41,7 +40,6 @@ ingestBtn.addEventListener("click", async () => {
     status.textContent = "Invalid metadata JSON.";
     return;
   }
-  // ------------------------
 
   ingestBtn.disabled = true;
   status.textContent = "Ingesting...";
@@ -49,7 +47,6 @@ ingestBtn.addEventListener("click", async () => {
 
   try {
     const body = { text, metadata };
-
     const res = await callApi("/ingest", {
       method: "POST",
       body: JSON.stringify(body)
@@ -69,14 +66,12 @@ ingestBtn.addEventListener("click", async () => {
   }
 });
 
-// Clear button
 document.getElementById("ingestClearBtn").addEventListener("click", () => {
   document.getElementById("ingestText").value = "";
   document.getElementById("ingestMetadata").value = "";
   document.getElementById("ingestStatus").textContent = "";
   document.getElementById("ingestResult").textContent = "{}";
 });
-
 
 // SEARCH
 const searchBtn = document.getElementById("searchBtn");
@@ -95,7 +90,7 @@ searchBtn.addEventListener("click", async () => {
     return;
   }
   if (!case_id) {
-    status.textContent = "Missing case_id: ingest text first.";
+    status.textContent = "Missing case_id: ingest first.";
     return;
   }
 
@@ -105,7 +100,6 @@ searchBtn.addEventListener("click", async () => {
 
   try {
     const body = { case_id, query, top_k, include_metadata };
-
     const res = await callApi("/search", {
       method: "POST",
       body: JSON.stringify(body)
@@ -121,9 +115,35 @@ searchBtn.addEventListener("click", async () => {
   }
 });
 
-// Search clear
 document.getElementById("searchClearBtn").addEventListener("click", () => {
   document.getElementById("searchQuery").value = "";
   document.getElementById("searchResult").textContent = "{}";
   document.getElementById("searchStatus").textContent = "";
+});
+
+
+// CASE VIEWER
+const loadCasesBtn = document.getElementById("loadCasesBtn");
+const caseList = document.getElementById("caseList");
+const caseDetails = document.getElementById("caseDetails");
+
+loadCasesBtn.addEventListener("click", async () => {
+  caseList.textContent = "Loading...";
+  try {
+    const res = await callApi("/cases");
+    caseList.textContent = pretty(res);
+
+    // Click handler for selecting a case
+    caseList.onclick = async (evt) => {
+      const text = evt.target.textContent;
+      const match = text.match(/"case_id": "([^"]+)"/);
+      if (!match) return;
+
+      const case_id = match[1];
+      const details = await callApi(`/cases/${case_id}`);
+      caseDetails.textContent = pretty(details);
+    };
+  } catch (err) {
+    caseList.textContent = pretty(err.body);
+  }
 });
