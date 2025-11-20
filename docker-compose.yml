@@ -6,7 +6,7 @@ services:
       context: .
       dockerfile: api/Dockerfile
     ports:
-      - "8000:8000"
+      - "8080:8000"       # <— CHANGED FROM 8000:8000
     volumes:
       - ./data:/data
       - ./static:/app/static
@@ -22,6 +22,8 @@ services:
       dockerfile: worker/Dockerfile
     volumes:
       - ./data:/data
+    depends_on:
+      - chroma
 
   chroma:
     image: ghcr.io/chroma-core/chroma:latest
