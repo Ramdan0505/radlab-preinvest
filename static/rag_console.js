@@ -35,13 +35,13 @@ ingestBtn.addEventListener("click", async () => {
   }
 
   let metadata;
-  if (metadataRaw) {
-    try { metadata = JSON.parse(metadataRaw); }
-    catch {
-      status.textContent = "Invalid metadata JSON.";
-      return;
-    }
-  }
+try {
+    metadata = metadataRaw ? JSON.parse(metadataRaw) : { source: "ui" };
+} catch {
+    status.textContent = "Invalid metadata JSON.";
+    return;
+}
+
 
   ingestBtn.disabled = true;
   status.textContent = "Ingesting...";
