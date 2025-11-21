@@ -60,7 +60,7 @@ ingestBtn.addEventListener("click", async () => {
     }
   } catch (err) {
     status.textContent = `Error: ${err.status ?? "?"}`;
-    result.textContent = pretty(err.body);
+    result.textContent = pretty(err.body ?? err);
   } finally {
     ingestBtn.disabled = false;
   }
@@ -109,7 +109,7 @@ searchBtn.addEventListener("click", async () => {
     result.textContent = pretty(res);
   } catch (err) {
     status.textContent = `Error: ${err.status ?? "?"}`;
-    result.textContent = pretty(err.body);
+    result.textContent = pretty(err.body ?? err);
   } finally {
     searchBtn.disabled = false;
   }
@@ -120,7 +120,6 @@ document.getElementById("searchClearBtn").addEventListener("click", () => {
   document.getElementById("searchResult").textContent = "{}";
   document.getElementById("searchStatus").textContent = "";
 });
-
 
 // CASE VIEWER
 const loadCasesBtn = document.getElementById("loadCasesBtn");
@@ -134,7 +133,7 @@ loadCasesBtn.addEventListener("click", async () => {
     const res = await callApi("/cases");
     caseListDisplay.innerHTML = "";
 
-    for (const c of res.cases) {
+    for (const c of res.cases || []) {
       const li = document.createElement("li");
       li.textContent = c.case_id;
       li.style.cursor = "pointer";
@@ -147,8 +146,11 @@ loadCasesBtn.addEventListener("click", async () => {
 
       caseListDisplay.appendChild(li);
     }
+
+    if (!res.cases || res.cases.length === 0) {
+      caseListDisplay.textContent = "No cases yet. Ingest something first.";
+    }
   } catch (err) {
-    caseListDisplay.textContent = pretty(err.body);
+    caseListDisplay.textContent = pretty(err.body ?? err);
   }
 });
-
