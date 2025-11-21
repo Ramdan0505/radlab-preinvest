@@ -6,6 +6,7 @@ import subprocess
 import json
 from typing import Any, Dict, Optional
 
+from fastapi import Body
 from fastapi import FastAPI, UploadFile, BackgroundTasks, Query
 from fastapi.responses import JSONResponse, HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
@@ -73,17 +74,25 @@ async def ingest_image(file: UploadFile, background_tasks: BackgroundTasks):
 
 
 # INGEST TEXT
-class IngestTextRequest(BaseModel):
-    text: str
-    case_id: Optional[str] = None
-    metadata: Optional[Dict[str, Any]] = None
-
 @app.post("/ingest")
-def ingest_text(req: IngestTextRequest):
-    case_id = req.case_id or str(uuid.uuid4())
+def ingest_text(body: Dict[str, Any] = Body(...)):
+    """
+    Ingest a plain text snippet into a case (semantic index).
+    Accepts any JSON dict; we extract 'text', 'case_id', and 'metadata' manually
+    to be robust to small front-end differences.
+    """
+    text = (body.get("text") or "").strip()
+    if not text:
+        return JSONResponse(
+            status_code=400,
+            content={"error": "Missing 'text' in request body."},
+        )
+
+    case_id = (body.get("case_id") or str(uuid.uuid4())).strip() or str(uuid.uuid4())
+    metadata = body.get("metadata") or {"source": "ui"}
+
     try:
-        metadata = req.metadata or {"source": "ui"}  # <-- FIX
-        embed_texts(case_id, [req.text], [metadata])
+        embed_texts(case_id, [text], [metadata])
         return {"status": "ok", "case_id": case_id, "ingested": 1}
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
