@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   api:
     build:
@@ -37,12 +35,11 @@ services:
     volumes:
       - ./chroma:/data
     healthcheck:
-      test: ["CMD-SHELL", "wget --spider --quiet http://localhost:8000/api/v1/heartbeat || exit 1"]
+      test: ["CMD-SHELL", "python3 - << 'EOF'\nimport requests; requests.get('http://localhost:8000/api/v1/heartbeat').raise_for_status()\nEOF"]
       interval: 5s
-      timeout: 3s
+      timeout: 5s
       retries: 20
     restart: always
-
 
   minio:
     image: minio/minio
