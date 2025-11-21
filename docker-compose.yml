@@ -37,11 +37,12 @@ services:
     volumes:
       - ./chroma:/data
     healthcheck:
-      test: ["CMD", "curl", "-f", "http://localhost:8000/api/v1/heartbeat"]
+      test: ["CMD-SHELL", "wget --spider --quiet http://localhost:8000/api/v1/heartbeat || exit 1"]
       interval: 5s
       timeout: 3s
       retries: 20
     restart: always
+
 
   minio:
     image: minio/minio
