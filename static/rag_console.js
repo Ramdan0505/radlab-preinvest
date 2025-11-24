@@ -1,5 +1,5 @@
 // CONFIG
-const baseUrl = "/";
+const baseUrl = "";
 document.getElementById("baseUrlDisplay").textContent = baseUrl || "/";
 
 async function callApi(path, options = {}) {
