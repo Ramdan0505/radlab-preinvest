@@ -10,7 +10,7 @@
 <body>
   <h1>Mini RAG Console</h1>
   <div class="subtitle">
-    Quick UI for <code>/ingest</code>, <code>/search</code>, and <code>Case Viewer</code>.
+    Quick UI for <code>/ingest</code>, <code>/ingest_file</code>, <code>/search</code>, and <code>Case Viewer</code>.
   </div>
 
   <div class="small">
@@ -20,9 +20,9 @@
 
   <div class="panels">
 
-    <!-- INGEST PANEL -->
+    <!-- TEXT INGEST PANEL -->
     <div class="card" id="ingestCard">
-      <h2>Ingest</h2>
+      <h2>Ingest (Text)</h2>
 
       <label for="ingestText">Text</label>
       <textarea id="ingestText"></textarea>
@@ -37,6 +37,24 @@
 
       <div id="ingestStatus" class="status"></div>
       <pre id="ingestResult">{}</pre>
+
+      <hr style="margin:0.75rem 0; border-color:#1f2937;" />
+
+      <!-- FILE INGEST (ZIP) -->
+      <h2 style="font-size:0.95rem; margin-top:0.5rem;">Ingest (File / ZIP)</h2>
+      <div class="small">
+        Upload a forensic bundle (e.g., ZIP with EVTX + registry hives). This calls <code>/ingest_file</code> and lets the worker process the case.
+      </div>
+
+      <label for="ingestFile">Forensic bundle file</label>
+      <input id="ingestFile" type="file" />
+
+      <div class="row" style="margin-top:0.5rem;">
+        <button id="ingestFileBtn" class="primary">Upload &amp; Ingest File</button>
+      </div>
+
+      <div id="ingestFileStatus" class="status"></div>
+      <pre id="ingestFileResult">{}</pre>
     </div>
 
     <!-- SEARCH PANEL -->
