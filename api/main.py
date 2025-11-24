@@ -1,4 +1,5 @@
 import os
+import requests
 import shutil
 import hashlib
 import uuid
@@ -189,3 +190,101 @@ def download_artifact(case_id: str, filename: str):
     if not os.path.exists(path):
         return JSONResponse(status_code=404, content={"error": "File not found"})
     return FileResponse(path, filename=filename)
+
+# ---------------------------------------------------
+# AI Explain Case  (using Ollama)
+@app.post("/explain_case")
+def explain_case_ollama(body: Dict[str, Any] = Body(...)):
+    case_id = body.get("case_id")
+    if not case_id:
+        return JSONResponse(status_code=400, content={"error": "Missing case_id"})
+
+    case_path = os.path.join(ARTIFACT_DIR, case_id)
+    if not os.path.isdir(case_path):
+        return JSONResponse(status_code=404, content={"error": "Case not found"})
+
+    # Helper to read text files safely
+    def read_text(name):
+        path = os.path.join(case_path, name)
+        if os.path.exists(path):
+            try:
+                return open(path, "r", encoding="utf-8").read()
+            except:
+                return ""
+        return ""
+
+    ingest = read_text("ingest.json")
+    triage_findings = read_text("triage_findings.json")
+    triage_topn = read_text("triage_topn.json")
+    registry_summaries = read_text("registry_summaries.jsonl")
+    evtx_summaries = read_text("evtx_summaries.jsonl")
+    playbook = read_text("playbook.md")
+
+    # Build DFIR prompt
+    prompt = f"""
+You are a senior DFIR (Digital Forensics and Incident Response) analyst.
+
+Analyze the following forensic case and produce a structured, professional report.
+
+CASE ID: {case_id}
+
+### Ingest Information
+{ingest or "(none)"}
+
+### Triage Findings
+{triage_findings or "(none)"}
+
+### Top Suspicious Items
+{triage_topn or "(none)"}
+
+### Registry Summaries
+{registry_summaries or "(none)"}
+
+### EVTX Summaries
+{evtx_summaries or "(none)"}
+
+### Playbook Notes
+{playbook or "(none)"}
+
+Your report MUST include:
+- Executive Summary
+- Indicators of Compromise (IOCs)
+- Key Evidence
+- Likely MITRE ATT&CK Techniques (name + technique ID if you know it)
+- Narrative Timeline of Activity
+- Recommended Next Steps for Investigators
+- Confidence Level and Any Data Gaps
+"""
+
+    # Call Ollama (from inside Docker using host.docker.internal)
+    try:
+        resp = requests.post(
+            "http://host.docker.internal:11434/api/chat",
+            json={
+                "model": "llama3",  # or qwen2.5, llama3.1, phi3, etc.
+                "messages": [
+                    {"role": "system", "content": "You are a professional DFIR analyst."},
+                    {"role": "user", "content": prompt},
+                ],
+                "stream": False,
+            },
+            timeout=180,
+        )
+        resp.raise_for_status()
+    except Exception as e:
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"Ollama request failed: {str(e)}"},
+        )
+
+    data = resp.json()
+
+    summary = data.get("message", {}).get("content", "").strip()
+    if not summary:
+        return JSONResponse(
+            status_code=500,
+            content={"error": "Ollama did not return a summary"},
+        )
+
+    return {"case_id": case_id, "summary": summary}
+
