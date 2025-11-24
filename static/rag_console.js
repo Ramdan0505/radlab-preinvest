@@ -204,3 +204,33 @@ loadCasesBtn.addEventListener("click", async () => {
     caseListDisplay.textContent = pretty(err.body ?? err);
   }
 });
+
+const explainCaseBtn = document.getElementById("explainCaseBtn");
+const explainStatus = document.getElementById("explainStatus");
+const explainResult = document.getElementById("explainResult");
+
+explainCaseBtn.addEventListener("click", async () => {
+  if (!lastCaseId) {
+    explainStatus.textContent = "No case selected.";
+    return;
+  }
+
+  explainCaseBtn.disabled = true;
+  explainStatus.textContent = "Summarizing case...";
+  explainResult.textContent = "{}";
+
+  try {
+    const res = await callApi("/explain_case", {
+      method: "POST",
+      body: JSON.stringify({ case_id: lastCaseId })
+    });
+
+    explainStatus.textContent = "AI summary ready.";
+    explainResult.textContent = res.summary || pretty(res);
+  } catch (err) {
+    explainStatus.textContent = `Error: ${err.status ?? "?"}`;
+    explainResult.textContent = pretty(err.body ?? err);
+  } finally {
+    explainCaseBtn.disabled = false;
+  }
+});
