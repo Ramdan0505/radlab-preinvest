@@ -19,8 +19,7 @@
   </div>
 
   <div class="panels">
-
-    <!-- TEXT INGEST PANEL -->
+    <!-- ===================== COLUMN 1: INGEST ===================== -->
     <div class="card" id="ingestCard">
       <h2>Ingest (Text)</h2>
 
@@ -40,7 +39,6 @@
 
       <hr style="margin:0.75rem 0; border-color:#1f2937;" />
 
-      <!-- FILE INGEST (ZIP) -->
       <h2 style="font-size:0.95rem; margin-top:0.5rem;">Ingest (File / ZIP)</h2>
       <div class="small">
         Upload a forensic bundle (e.g., ZIP with EVTX + registry hives). This calls <code>/ingest_file</code> and lets the worker process the case.
@@ -57,7 +55,7 @@
       <pre id="ingestFileResult">{}</pre>
     </div>
 
-    <!-- SEARCH PANEL -->
+    <!-- ===================== COLUMN 2: SEARCH ===================== -->
     <div class="card" id="searchCard">
       <h2>Search</h2>
 
@@ -86,25 +84,25 @@
       <pre id="searchResult">{}</pre>
     </div>
 
-    <!-- CASE VIEWER PANEL -->
+    <!-- ============ COLUMN 3: CASE VIEWER + DETAILS + AI EXPLAIN ============ -->
     <div class="card" id="caseViewerCard">
       <h2>Case Viewer</h2>
 
       <button id="loadCasesBtn" class="primary">Load Cases</button>
-
       <ul id="caseListDisplay"></ul>
 
       <h3>Case Details</h3>
-      <pre id="caseDetails">{}</pre>
+      <pre id="caseDetails" style="height: 180px; overflow-y: auto;">{}</pre>
+
+      <!-- AI Explain Case is embedded directly under Case Details -->
+      <div id="explainCard">
+        <h3>AI Explain Case</h3>
+        <button id="explainCaseBtn" class="primary">Explain Selected Case</button>
+        <div id="explainStatus" class="status"></div>
+        <pre id="explainResult">{}</pre>
+      </div>
     </div>
-
-    <h3>AI Explain Case</h3>
-    <button id="explainCaseBtn" class="primary">Explain Selected Case</button>
-    <div id="explainStatus" class="status"></div>
-    <pre id="explainResult">{}</pre>
-
-
-  </div> <!-- close .panels -->
+  </div> <!-- /.panels -->
 
   <script src="/static/rag_console.js"></script>
 </body>
