@@ -96,18 +96,25 @@
 
       <!-- AI Explain Case is embedded directly under Case Details -->
       <div id="explainCard">
-        <h3>AI Explain Case</h3>
+  <h3>AI Explain Case</h3>
 
-        <div class="row">
-          <button id="explainCaseBtn" class="primary">Explain Selected Case</button>
-          <button id="copyExplainBtn">Copy Report</button>
-          <button id="downloadExplainBtn">Download .md</button>
-        </div>
+  <div class="row">
+    <button id="explainCaseBtn" class="primary">Explain Selected Case</button>
+    <button id="copyExplainBtn">Copy Report</button>
+    <button id="downloadExplainBtn">Download .md</button>
+  </div>
 
-        <div id="explainStatus" class="status"></div>
+  <div id="explainStatus" class="status"></div>
+  <pre id="explainResult">{}</pre>
 
-        <pre id="explainResult">{}</pre>
-      </div>
+  <h4 style="margin-top:0.75rem;">MITRE ATT&amp;CK Techniques</h4>
+  <div class="row">
+    <button id="mitreExtractBtn">Extract MITRE Tags</button>
+  </div>
+  <div id="mitreStatus" class="status"></div>
+  <pre id="mitreResult">{}</pre>
+</div>
+
     </div>
   </div> <!-- /.panels -->
 
