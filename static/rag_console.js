@@ -295,3 +295,41 @@ downloadExplainBtn.addEventListener("click", () => {
   explainStatus.textContent = `Report downloaded as ${filename}.`;
 });
 
+// ---------------- MITRE ATT&CK extraction from AI summary ----------------
+const mitreExtractBtn = document.getElementById("mitreExtractBtn");
+const mitreStatus = document.getElementById("mitreStatus");
+const mitreResult = document.getElementById("mitreResult");
+
+mitreExtractBtn.addEventListener("click", async () => {
+  const summary = explainResult.textContent.trim();
+  if (!lastCaseId) {
+    mitreStatus.textContent = "No case selected.";
+    return;
+  }
+  if (!summary || summary === "{}") {
+    mitreStatus.textContent = "No summary yet. Run Explain Case first.";
+    return;
+  }
+
+  mitreExtractBtn.disabled = true;
+  mitreStatus.textContent = "Extracting MITRE techniques...";
+  mitreResult.textContent = "{}";
+
+  try {
+    const body = { case_id: lastCaseId, summary };
+    const res = await callApi("/mitre_tags", {
+      method: "POST",
+      body: JSON.stringify(body)
+    });
+
+    mitreStatus.textContent = "MITRE extraction OK.";
+    // Expect res.tags to be either an array or raw text; pretty-print if structured
+    mitreResult.textContent = res.tags ? pretty(res.tags) : pretty(res);
+  } catch (err) {
+    mitreStatus.textContent = `Error: ${err.status ?? "?"}`;
+    mitreResult.textContent = pretty(err.body ?? err);
+  } finally {
+    mitreExtractBtn.disabled = false;
+  }
+});
+
