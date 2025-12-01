@@ -234,3 +234,64 @@ explainCaseBtn.addEventListener("click", async () => {
     explainCaseBtn.disabled = false;
   }
 });
+
+// Copy / Download AI report
+const copyExplainBtn = document.getElementById("copyExplainBtn");
+const downloadExplainBtn = document.getElementById("downloadExplainBtn");
+
+copyExplainBtn.addEventListener("click", async () => {
+  const text = explainResult.textContent.trim();
+  if (!text || text === "{}") {
+    explainStatus.textContent = "Nothing to copy yet. Run Explain Case first.";
+    return;
+  }
+
+  try {
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      await navigator.clipboard.writeText(text);
+      explainStatus.textContent = "Report copied to clipboard.";
+    } else {
+      // Fallback: select text
+      const range = document.createRange();
+      range.selectNodeContents(explainResult);
+      const sel = window.getSelection();
+      sel.removeAllRanges();
+      sel.addRange(range);
+      try {
+        const ok = document.execCommand("copy");
+        explainStatus.textContent = ok ? "Report copied to clipboard." : "Copy failed.";
+      } finally {
+        sel.removeAllRanges();
+      }
+    }
+  } catch (e) {
+    explainStatus.textContent = "Copy failed.";
+    console.error("Copy report failed:", e);
+  }
+});
+
+downloadExplainBtn.addEventListener("click", () => {
+  const text = explainResult.textContent.trim();
+  if (!text || text === "{}") {
+    explainStatus.textContent = "Nothing to download yet. Run Explain Case first.";
+    return;
+  }
+
+  const blob = new Blob([text], { type: "text/markdown" });
+
+  // Use case ID in filename if available
+  const caseIdForName = (typeof lastCaseId === "string" && lastCaseId) ? lastCaseId : "unknown_case";
+  const filename = `dfir_report_${caseIdForName}.md`;
+
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+
+  explainStatus.textContent = `Report downloaded as ${filename}.`;
+});
+
