@@ -97,8 +97,15 @@
       <!-- AI Explain Case is embedded directly under Case Details -->
       <div id="explainCard">
         <h3>AI Explain Case</h3>
-        <button id="explainCaseBtn" class="primary">Explain Selected Case</button>
+
+        <div class="row">
+          <button id="explainCaseBtn" class="primary">Explain Selected Case</button>
+          <button id="copyExplainBtn">Copy Report</button>
+          <button id="downloadExplainBtn">Download .md</button>
+        </div>
+
         <div id="explainStatus" class="status"></div>
+
         <pre id="explainResult">{}</pre>
       </div>
     </div>
