@@ -111,3 +111,31 @@ pre {
   color: #6b7280;
   margin-top: 0.25rem;
 }
+
+/* Ensure 3 columns: Ingest, Search, Case Viewer+Explain */
+.panels {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(320px, 1fr));
+  gap: 1rem;
+}
+
+/* Explain Case card styling */
+#explainCard {
+  margin-top: 1rem;
+  border-top: 1px solid #1f2937;
+  padding-top: 0.75rem;
+}
+
+#explainResult {
+  margin-top: 0.5rem;
+  height: 260px;
+  overflow-y: auto;
+  white-space: pre-wrap;
+  background: #020617;
+  border-radius: 0.5rem;
+  border: 1px solid #374151;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  line-height: 1.4;
+}
+
