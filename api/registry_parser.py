@@ -28,7 +28,12 @@ REGISTRY_TARGETS: Dict[str, List[Dict[str, str]]] = {
             "category": "recent_docs",
         },
     ],
-    "SOFTWARE": [
+        "SOFTWARE": [
+        {
+            # Always has values like ProductName, CurrentBuild
+            "key": r"Microsoft\Windows NT\CurrentVersion",
+            "category": "os_version",
+        },
         {
             "key": r"Microsoft\Windows\CurrentVersion\Run",
             "category": "persistence_run",
@@ -36,10 +41,6 @@ REGISTRY_TARGETS: Dict[str, List[Dict[str, str]]] = {
         {
             "key": r"Microsoft\Windows\CurrentVersion\RunOnce",
             "category": "persistence_run_once",
-        },
-        {
-            "key": r"Microsoft\Windows\CurrentVersion\Uninstall",
-            "category": "installed_software",
         },
     ],
     "SYSTEM": [
