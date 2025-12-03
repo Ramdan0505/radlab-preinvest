@@ -139,14 +139,16 @@ def format_event_for_text(event: Dict[str, Any]) -> str:
     channel = event.get("channel") or ""
     data = event.get("data") or {}
 
-    # Compact key=value representation
-    kv_pairs = " ".join(
-        f"{k}={str(v).replace('\\n', ' ').replace('\\r', ' ')}"
-        for k, v in data.items()
-        if v
-    )
+    clean_data = {}
+    for k, v in data.items():
+        if v:
+            s = str(v).replace("\n", " ").replace("\r", " ")
+            clean_data[k] = s
+
+    kv_pairs = " ".join(f"{k}={v}" for k, v in clean_data.items())
 
     return f"[{ts}] EventID={eid} Record={rec} Computer={comp} Channel={channel} {kv_pairs}".strip()
+
 
 
 def generate_evtx_derivatives(evtx_path: str, case_dir: str) -> Dict[str, Any]:
