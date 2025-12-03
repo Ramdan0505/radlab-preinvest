@@ -8,7 +8,8 @@ from api.registry_parser import generate_registry_derivatives
 from api.embedder import embed_texts
 
 TEXT_EXTENSIONS = {".txt", ".log", ".json", ".csv", ".md"}
-REGISTRY_EXTENSIONS = {".dat", ".hiv", ".hive"}  # crude but effective
+REGISTRY_EXTENSIONS = {".dat", ".hiv", ".hive", ".reg"}
+  # crude but effective
 
 
 def build_and_index_case_corpus(case_dir: str, case_id: str) -> int:
