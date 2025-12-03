@@ -1,7 +1,7 @@
 # api/ingest_utils.py
 
 import os
-from typing import List
+from typing import List, Dict, Any
 
 from api.evtx_parser import generate_evtx_derivatives
 from api.embedder import embed_texts
