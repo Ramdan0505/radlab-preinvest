@@ -6,8 +6,9 @@ import hashlib
 import uuid
 import subprocess
 import json
-from typing import Any, Dict
 
+from typing import Any, Dict
+from api.ingest_utils import build_and_index_case_corpus
 from fastapi import Body, FastAPI, UploadFile, BackgroundTasks
 from fastapi.responses import JSONResponse, HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
