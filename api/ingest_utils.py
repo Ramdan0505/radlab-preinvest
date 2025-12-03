@@ -65,11 +65,16 @@ def build_and_index_case_corpus(case_dir: str, case_id: str) -> int:
                     or base_upper.startswith("SOFTWARE")
                     or base_upper.startswith("SYSTEM")
                 ):
-                    stats = generate_registry_derivatives(path, case_dir)
+                    print(f"[DEBUG] Registry candidate detected: {filename}")
+
+                    try:
+                        stats = generate_registry_derivatives(path, case_dir)
+                        print(f"[REGISTRY] {filename}: {stats['events_count']} entries parsed")
+                    except Exception as e:
+                        print(f"[REGISTRY ERROR] Failed to parse {filename}: {e}")
+                        continue
+
                     if stats["events_count"] > 0:
-                        print(
-                            f"[REGISTRY] {filename}: {stats['events_count']} entries parsed"
-                        )
                         with open(stats["txt_path"], "r", encoding="utf-8") as f:
                             for line in f:
                                 line = line.strip()
@@ -84,6 +89,7 @@ def build_and_index_case_corpus(case_dir: str, case_id: str) -> int:
                                     }
                                 )
                                 reg_summary_f.write(line + "\n")
+
 
                 # 3) Normal text-like files
                 elif ext in TEXT_EXTENSIONS:
