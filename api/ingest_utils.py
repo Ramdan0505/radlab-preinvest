@@ -7,9 +7,9 @@ from api.evtx_parser import generate_evtx_derivatives
 from api.registry_parser import generate_registry_derivatives
 from api.embedder import embed_texts
 
+# File type sets
 TEXT_EXTENSIONS = {".txt", ".log", ".json", ".csv", ".md"}
 REGISTRY_EXTENSIONS = {".dat", ".hiv", ".hive", ".reg"}
-  # crude but effective
 
 
 def build_and_index_case_corpus(case_dir: str, case_id: str) -> int:
@@ -37,7 +37,10 @@ def build_and_index_case_corpus(case_dir: str, case_id: str) -> int:
                 path = os.path.join(root, filename)
                 ext = os.path.splitext(filename)[1].lower()
                 rel_path = os.path.relpath(path, case_dir)
-                base_upper = os.path.basename(path).upper()
+
+                # Skip our own summary files to avoid re-ingesting them
+                if filename in ("evtx_summaries.jsonl", "registry_summaries.jsonl"):
+                    continue
 
                 # 1) EVTX files
                 if ext == ".evtx":
@@ -59,21 +62,13 @@ def build_and_index_case_corpus(case_dir: str, case_id: str) -> int:
                             )
                             evtx_summary_f.write(line + "\n")
 
-                # 2) Registry hives (NTUSER.DAT, SOFTWARE, SYSTEM, etc.)
-                elif (
-                    ext in REGISTRY_EXTENSIONS
-                    or base_upper.startswith("NTUSER")
-                    or base_upper.startswith("SOFTWARE")
-                    or base_upper.startswith("SYSTEM")
-                ):
+                # 2) Registry hives or REG exports
+                elif ext in REGISTRY_EXTENSIONS:
                     print(f"[DEBUG] Registry candidate detected: {filename}")
-
-                    try:
-                        stats = generate_registry_derivatives(path, case_dir)
-                        print(f"[REGISTRY] {filename}: {stats['events_count']} entries parsed")
-                    except Exception as e:
-                        print(f"[REGISTRY ERROR] Failed to parse {filename}: {e}")
-                        continue
+                    stats = generate_registry_derivatives(path, case_dir)
+                    print(
+                        f"[REGISTRY] {filename}: {stats['events_count']} entries parsed"
+                    )
 
                     if stats["events_count"] > 0:
                         with open(stats["txt_path"], "r", encoding="utf-8") as f:
@@ -90,7 +85,6 @@ def build_and_index_case_corpus(case_dir: str, case_id: str) -> int:
                                     }
                                 )
                                 reg_summary_f.write(line + "\n")
-
 
                 # 3) Normal text-like files
                 elif ext in TEXT_EXTENSIONS:
@@ -118,6 +112,7 @@ def build_and_index_case_corpus(case_dir: str, case_id: str) -> int:
             reg_summary_f.close()
 
     if text_chunks:
+        # Your embed_texts expects (case_id, texts, metadata_list)
         embed_texts(case_id, text_chunks, metadata_list)
 
     return len(text_chunks)
