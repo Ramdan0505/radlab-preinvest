@@ -150,7 +150,7 @@ def iter_registry_events(hive_path: str) -> List[Dict[str, Any]]:
 # ---------------------------
 
 def parse_reg_file(reg_path: str) -> List[Dict[str, Any]]:
-    """
+    r"""
     Parse a REG file exported with `reg export`.
 
     This parser:
