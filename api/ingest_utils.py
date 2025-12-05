@@ -38,7 +38,7 @@ def build_and_index_case_corpus(case_dir: str, case_id: str) -> int:
                 ext = os.path.splitext(filename)[1].lower()
                 rel_path = os.path.relpath(path, case_dir)
 
-                # Skip our own summary files to avoid re-ingesting them
+                # Skip our own summary files to avoid feedback loops
                 if filename in ("evtx_summaries.jsonl", "registry_summaries.jsonl"):
                     continue
 
@@ -112,7 +112,7 @@ def build_and_index_case_corpus(case_dir: str, case_id: str) -> int:
             reg_summary_f.close()
 
     if text_chunks:
-        # Your embed_texts expects (case_id, texts, metadata_list)
+        # embed_texts(case_id, texts, metadata_list)
         embed_texts(case_id, text_chunks, metadata_list)
 
     return len(text_chunks)
