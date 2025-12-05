@@ -194,17 +194,19 @@ def parse_reg_file(reg_path: str) -> List[Dict[str, Any]]:
                 # Keep raw value string (e.g., "SomeValue", dword:00000001, hex:...)
                 value = value_part
 
-                events.append(
-                    {
-                        "hive": "SOFTWARE.REG",
-                        "key_path": current_key,
-                        "category": "reg_export",
-                        "value_name": value_name,
-                        "value": value,
-                        "value_type": "raw",
-                        "last_write": None,
-                    }
-                )
+                # Only include categories whose key paths match REGISTRY_TARGETS
+if any(target["key"] in current_key for target in REGISTRY_TARGETS.get("SOFTWARE", [])):
+    events.append(
+        {
+            "hive": "SOFTWARE.REG",
+            "key_path": current_key,
+            "category": "reg_export",
+            "value_name": value_name,
+            "value": value,
+            "value_type": "raw",
+            "last_write": None,
+        }
+    )
 
     return events
 
