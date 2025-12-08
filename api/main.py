@@ -19,6 +19,8 @@ from pathlib import Path
 
 from api.embedder import semantic_search, embed_texts
 
+OLLAMA_BASE_URL = os.environ.get("OLLAMA_BASE_URL", "http://127.0.0.1:11434")
+
 app = FastAPI(title="Pre-Investigation DFIR Agent")
 
 # STATIC UI
