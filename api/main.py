@@ -436,17 +436,18 @@ If there are no clear techniques, return [].
 
     try:
         resp = requests.post(
-            "http://host.docker.internal:11434/api/chat",
-            json={
-                "model": "llama3",
-                "messages": [
-                    {"role": "system", "content": "You are a professional DFIR analyst and MITRE ATT&CK expert."},
-                    {"role": "user", "content": prompt},
-                ],
-                "stream": False,
-            },
-            timeout=180,
-        )
+        f"{OLLAMA_BASE_URL}/api/chat",
+        json={
+            "model": "llama3",
+            "messages": [
+                {"role": "system", "content": "You are a professional DFIR analyst and MITRE ATT&CK expert."},
+                {"role": "user", "content": prompt},
+            ],
+            "stream": False,
+    },
+    timeout=180,
+)
+
         resp.raise_for_status()
     except Exception as e:
         return JSONResponse(
