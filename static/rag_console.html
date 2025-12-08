@@ -96,21 +96,28 @@
       <pre id="caseDetails" style="height: 180px; overflow-y: auto;">{}</pre>
 
       <!-- AI Explain Case is embedded directly under Case Details -->
-      <div id="explainCard">
+     <div id="explainCard">
   <h3>AI Explain Case</h3>
 
   <h3>Case Timeline</h3>
-<div id="timeline-container">
-  <!-- Timeline table will be injected here -->
-</div>
+  <div class="row" style="margin-bottom: 0.5rem;">
+    <button id="btnTimeline">Load Timeline</button>
+  </div>
+  <div id="timeline-container">
+    <!-- Timeline table or text will be injected here -->
+  </div>
 
-<input id="case-id-input">
+  <label for="case-id-input" class="small">Case ID</label>
+  <input id="case-id-input" type="text" />
 
   <div class="row">
     <button id="explainCaseBtn" class="primary">Explain Selected Case</button>
     <button id="copyExplainBtn">Copy Report</button>
     <button id="downloadExplainBtn">Download .md</button>
   </div>
+  ...
+</div>
+
 
   <div id="explainStatus" class="status"></div>
   <pre id="explainResult">{}</pre>
