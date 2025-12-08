@@ -190,16 +190,17 @@ loadCasesBtn.addEventListener("click", async () => {
       li.style.color = "#22c55e";
 
       li.onclick = async () => {
-        const details = await callApi(`/cases/${c.case_id}`);
-        caseDetails.textContent = pretty(details);
+      const details = await callApi(`/cases/${c.case_id}`);
+      caseDetails.textContent = pretty(details);
 
-        // remember selected case for Explain / MITRE
-        lastCaseId = c.case_id;
+      // Save selected case so Explain Case + MITRE + Timeline all work
+      lastCaseId = c.case_id;
 
-        // populate timeline case id input
-        const caseIdInput = document.getElementById("case-id-input");
-        if (caseIdInput) caseIdInput.value = c.case_id;
+      // Auto-fill the Case ID input for timeline
+      const input = document.getElementById("case-id-input");
+      if (input) input.value = c.case_id;
     };
+
 
 
       caseListDisplay.appendChild(li);
