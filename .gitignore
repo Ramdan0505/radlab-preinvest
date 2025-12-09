@@ -31,3 +31,6 @@ minio/
 # Node / frontend artifacts (if needed later)
 node_modules/
 dist/
+
+# .env file
+.env
