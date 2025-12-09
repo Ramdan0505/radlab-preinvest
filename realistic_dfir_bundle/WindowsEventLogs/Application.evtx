@@ -1,0 +1,11 @@
+<!-- Synthetic Application.evtx -->
+<Event>
+  <System>
+    <EventID>1000</EventID>
+    <TimeCreated SystemTime="2025-03-10T13:08:00Z" />
+    <SourceName>BadUpdater.exe</SourceName>
+  </System>
+  <EventData>
+    <Data Name="Message">BadUpdater.exe encountered an exception while contacting http://malicious.example.com/beacon</Data>
+  </EventData>
+</Event>

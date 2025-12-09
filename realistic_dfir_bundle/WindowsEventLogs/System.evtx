@@ -1,0 +1,12 @@
+<!-- Synthetic System.evtx -->
+<Event>
+  <System>
+    <EventID>7045</EventID>
+    <TimeCreated SystemTime="2025-03-10T13:07:10Z" />
+    <ProviderName>Service Control Manager</ProviderName>
+  </System>
+  <EventData>
+    <Data Name="ServiceName">BadUpdaterSvc</Data>
+    <Data Name="ImagePath">C:\\Users\\Public\\updater.exe</Data>
+  </EventData>
+</Event>

