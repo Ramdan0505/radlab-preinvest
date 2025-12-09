@@ -355,7 +355,7 @@ Your report MUST include:
         resp = requests.post(
         f"{OLLAMA_BASE_URL}/api/chat",
         json={
-            "model": "llama3",  # adjust model name if you use a different local model
+            "model": "llama3.2:3b",  # adjust model name if you use a different local model
             "messages": [
                 {"role": "system", "content": "You are a professional DFIR analyst."},
                 {"role": "user", "content": prompt},
@@ -438,7 +438,7 @@ If there are no clear techniques, return [].
         resp = requests.post(
         f"{OLLAMA_BASE_URL}/api/chat",
         json={
-            "model": "llama3",
+            "model": "llama3.2:3b",
             "messages": [
                 {"role": "system", "content": "You are a professional DFIR analyst and MITRE ATT&CK expert."},
                 {"role": "user", "content": prompt},
