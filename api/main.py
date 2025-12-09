@@ -396,6 +396,18 @@ INCIDENT SUMMARY:
 
     return {"case_id": case_id, "tags": tags}
 
+@app.get("/test_openai")
+def test_openai():
+    try:
+        response = client.chat.completions.create(
+            model="gpt-5.1",
+            messages=[{"role": "user", "content": "Hello"}]
+        )
+        return {"status": "ok", "reply": response.choices[0].message.content}
+    except Exception as e:
+        return {"status": "error", "error": str(e)}
+
+
 # ------------------------------------------------------------------------------------
 # END OF FILE
 # ------------------------------------------------------------------------------------
