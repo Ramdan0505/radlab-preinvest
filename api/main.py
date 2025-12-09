@@ -335,6 +335,13 @@ Your report MUST include:
 
     return {"case_id": case_id, "summary": summary}
 
+@app.post("/worker_done")
+def worker_done(body: dict = Body(...)):
+    case_id = body.get("case_id")
+    print(f"[API] Worker reports extraction complete for case {case_id}")
+    return {"status": "ok", "case_id": case_id}
+
+
 # ------------------------------------------------------------------------------------
 # MITRE ATT&CK TAGGING (OpenAI GPT-5.1)
 # ------------------------------------------------------------------------------------
