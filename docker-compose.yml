@@ -1,46 +1,69 @@
+version: "3.9"
+
 services:
+
+  # -------------------------------------------------------
+  # FASTAPI BACKEND (Main DFIR API)
+  # -------------------------------------------------------
   api:
     build:
       context: .
       dockerfile: api/Dockerfile
     ports:
-      - "8080:8000"
+      - "8080:8000"                     # Host:Container
     volumes:
-      - ./data:/data
-      - ./static:/app/static
+      - ./data:/data                    # DFIR artifacts
+      - ./static:/app/static            # UI assets
+    env_file:
+      - .env                            # Loads OPENAI_API_KEY, others
     environment:
-      ARTIFACT_DIR: /data/artifacts
+      ARTIFACT_DIR: /data/artifacts     # Keeps artifacts in persistent storage
     depends_on:
       - chroma
       - worker
-    restart: always
+    restart: unless-stopped
 
+
+  # -------------------------------------------------------
+  # WORKER SERVICE (for extraction + background jobs)
+  # -------------------------------------------------------
   worker:
     build:
       context: .
       dockerfile: worker/Dockerfile
     volumes:
-      - ./data:/data
+      - ./data:/data                    # Worker reads/writes DFIR case data
+    env_file:
+      - .env                            # Worker also needs access to API key
     depends_on:
       - chroma
-    restart: always
+    restart: unless-stopped
 
+
+  # -------------------------------------------------------
+  # CHROMA VECTOR DATABASE (Embeddings + RAG Index)
+  # -------------------------------------------------------
   chroma:
     image: ghcr.io/chroma-core/chroma:latest
     ports:
-      - "8001:8000"
+      - "8001:8000"                     # Expose only for debugging
     volumes:
-      - ./chroma:/data
-    restart: always
+      - ./chroma:/data                  # Persistent vector database
+    restart: unless-stopped
 
+
+  # -------------------------------------------------------
+  # MINIO (Local S3-compatible object storage)
+  # -------------------------------------------------------
   minio:
     image: minio/minio
-    command: server /data
+    command: server /data --console-address ":9001"
     environment:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     ports:
-      - "9000:9000"
+      - "9000:9000"                     # S3 API
+      - "9001:9001"                     # MinIO Console UI
     volumes:
-      - ./minio:/data
-    restart: always
+      - ./minio:/data                   # Persist object storage
+    restart: unless-stopped
