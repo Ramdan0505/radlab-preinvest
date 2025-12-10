@@ -20,7 +20,7 @@ RUN pip install --upgrade pip && \
 
 COPY api /app/api
 COPY static /app/static
-COPY worker /app/worker      # <-- NEW LINE
+COPY worker /app/worker      
 
 RUN mkdir -p /data/artifacts
 
