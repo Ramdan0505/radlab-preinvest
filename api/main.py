@@ -8,20 +8,20 @@ import subprocess
 from pathlib import Path
 from typing import Any, Dict
 
-
 from fastapi import FastAPI, UploadFile, BackgroundTasks, Body
 from fastapi.responses import JSONResponse, HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+from dotenv import load_dotenv
 from openai import OpenAI
+
 from api.timeline import build_timeline
 from api.embedder import semantic_search, embed_texts
 from api.ingest_utils import build_and_index_case_corpus
-from dotenv import load_dotenv
-load_dotenv()
 
+load_dotenv()
 
 # ------------------------------------------------------------------------------------
 # CONFIGURATION
@@ -52,10 +52,12 @@ app.add_middleware(
 # HELPER FUNCTIONS
 # ------------------------------------------------------------------------------------
 
+
 def save_upload(file: UploadFile, target_path: str) -> None:
     os.makedirs(os.path.dirname(target_path), exist_ok=True)
     with open(target_path, "wb") as f:
         shutil.copyfileobj(file.file, f)
+
 
 def hash_file(path: str) -> str:
     h = hashlib.sha256()
@@ -64,12 +66,14 @@ def hash_file(path: str) -> str:
             h.update(chunk)
     return h.hexdigest()
 
+
 def kick_extract_task(image_path: str, case_id: str) -> None:
     subprocess.Popen(
         [sys.executable, "/app/worker/extract_job.py", image_path, case_id],
         stdout=subprocess.DEVNULL,
         stderr=subprocess.DEVNULL,
     )
+
 
 def read_text_file(base: Path, name: str) -> str:
     p = base / name
@@ -83,6 +87,7 @@ def read_text_file(base: Path, name: str) -> str:
 # ------------------------------------------------------------------------------------
 # INGEST FILE ENDPOINT
 # ------------------------------------------------------------------------------------
+
 
 @app.post("/ingest_file")
 async def ingest_image(file: UploadFile, background_tasks: BackgroundTasks):
@@ -106,6 +111,7 @@ async def ingest_image(file: UploadFile, background_tasks: BackgroundTasks):
 # INGEST RAW TEXT
 # ------------------------------------------------------------------------------------
 
+
 @app.post("/ingest")
 def ingest_text(body: Dict[str, Any] = Body(...)):
     text = (body.get("text") or "").strip()
@@ -125,6 +131,7 @@ def ingest_text(body: Dict[str, Any] = Body(...)):
 # UI ROOT
 # ------------------------------------------------------------------------------------
 
+
 @app.get("/", response_class=HTMLResponse)
 async def serve_ui():
     ui_path = os.path.join(static_dir, "rag_console.html")
@@ -136,10 +143,12 @@ async def serve_ui():
 # SEARCH ENDPOINTS
 # ------------------------------------------------------------------------------------
 
+
 class SearchRequest(BaseModel):
     case_id: str
     query: str
     top_k: int = 5
+
 
 @app.get("/search")
 def search_get(case_id: str, q: str, top_k: int = 5):
@@ -147,6 +156,7 @@ def search_get(case_id: str, q: str, top_k: int = 5):
         return semantic_search(case_id, q, top_k)
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
+
 
 @app.post("/search")
 def search_post(req: SearchRequest):
@@ -158,6 +168,7 @@ def search_post(req: SearchRequest):
 # ------------------------------------------------------------------------------------
 # CASE LISTING
 # ------------------------------------------------------------------------------------
+
 
 @app.get("/cases")
 def list_cases():
@@ -182,6 +193,7 @@ def list_cases():
 # ------------------------------------------------------------------------------------
 # CASE DETAILS
 # ------------------------------------------------------------------------------------
+
 
 @app.get("/cases/{case_id}")
 def get_case(case_id: str):
@@ -213,6 +225,7 @@ def get_case(case_id: str):
 # ARTIFACT DOWNLOAD (SAFE)
 # ------------------------------------------------------------------------------------
 
+
 @app.get("/cases/{case_id}/download/{filename}")
 def download_artifact(case_id: str, filename: str):
     safe_name = os.path.basename(filename)
@@ -234,6 +247,7 @@ def download_artifact(case_id: str, filename: str):
 # REINDEX CASE
 # ------------------------------------------------------------------------------------
 
+
 @app.post("/cases/{case_id}/reindex")
 def reindex_case(case_id: str):
     case_dir = Path(ARTIFACT_DIR) / case_id
@@ -251,6 +265,7 @@ def reindex_case(case_id: str):
 # TIMELINE
 # ------------------------------------------------------------------------------------
 
+
 @app.get("/cases/{case_id}/timeline")
 def get_case_timeline(case_id: str):
     case_dir = Path(ARTIFACT_DIR) / case_id
@@ -265,12 +280,10 @@ def get_case_timeline(case_id: str):
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 # ------------------------------------------------------------------------------------
-# EXPLAIN CASE (OpenAI GPT-5.1)
+# EXPLAIN CASE (OpenAI GPT-5.1) + ANALYST NOTES
 # ------------------------------------------------------------------------------------
 
-# ---------------------------------------------------
-# AI Explain Case (OpenAI + analyst notes)
-# ---------------------------------------------------
+
 @app.post("/explain_case")
 def explain_case_openai(body: Dict[str, Any] = Body(...)):
     case_id = body.get("case_id")
@@ -281,12 +294,11 @@ def explain_case_openai(body: Dict[str, Any] = Body(...)):
     if not case_path.is_dir():
         return JSONResponse(status_code=404, content={"error": "Case not found"})
 
-        # Helper to read text files safely, relative to case_path
+    # Helper to read text files safely, from case root or files/
     def read_text(name: str) -> str:
-        # Look in both the root and the extracted 'files/' folder
         candidates = [
-            case_path / name,                  # e.g. /data/artifacts/<id>/Notes/...
-            case_path / "files" / name,        # e.g. /data/artifacts/<id>/files/Notes/...
+            case_path / name,
+            case_path / "files" / name,
         ]
         for p in candidates:
             if p.exists():
@@ -297,7 +309,6 @@ def explain_case_openai(body: Dict[str, Any] = Body(...)):
                     continue
         return ""
 
-
     # Core artifacts
     ingest = read_text("ingest.json")
     triage_findings = read_text("triage_findings.json")
@@ -306,15 +317,15 @@ def explain_case_openai(body: Dict[str, Any] = Body(...)):
     evtx_summaries = read_text("evtx_summaries.jsonl")
     playbook = read_text("playbook.md")
 
-    # NEW: analyst notes from the bundle (e.g. Notes/operator_notes.txt)
+    # Analyst notes from the bundle (e.g. Notes/operator_notes.txt)
     analyst_notes = read_text("Notes/operator_notes.txt")
 
-    # Build DFIR prompt
+    # DFIR prompt
     prompt = f"""
 You are a senior DFIR (Digital Forensics and Incident Response) analyst.
 
 Analyze the following forensic case and produce a structured, professional report.
-If some artifacts are missing (no triage findings, no EVTX summaries, etc.), 
+If some artifacts are missing (no triage findings, no EVTX summaries, etc.),
 be explicit about those data gaps and base your conclusions only on available evidence.
 
 CASE ID: {case_id}
@@ -373,6 +384,10 @@ Your report MUST include:
 
     return {"case_id": case_id, "summary": summary}
 
+# ------------------------------------------------------------------------------------
+# WORKER CALLBACK
+# ------------------------------------------------------------------------------------
+
 
 @app.post("/worker_done")
 def worker_done(body: dict = Body(...)):
@@ -380,10 +395,10 @@ def worker_done(body: dict = Body(...)):
     print(f"[API] Worker reports extraction complete for case {case_id}")
     return {"status": "ok", "case_id": case_id}
 
-
 # ------------------------------------------------------------------------------------
 # MITRE ATT&CK TAGGING (OpenAI GPT-5.1)
 # ------------------------------------------------------------------------------------
+
 
 @app.post("/mitre_tags")
 def mitre_tags_openai(body: Dict[str, Any] = Body(...)):
@@ -421,7 +436,7 @@ INCIDENT SUMMARY:
             messages=[
                 {"role": "system", "content": "MITRE ATT&CK expert."},
                 {"role": "user", "content": prompt},
-            ]
+            ],
         )
         text = response.choices[0].message.content.strip()
 
@@ -431,21 +446,28 @@ INCIDENT SUMMARY:
             tags = {"raw": text}
 
     except Exception as e:
-        return JSONResponse(status_code=500, content={"error": f"OpenAI request failed: {str(e)}"})
+        return JSONResponse(
+            status_code=500,
+            content={"error": f"OpenAI request failed: {str(e)}"},
+        )
 
     return {"case_id": case_id, "tags": tags}
+
+# ------------------------------------------------------------------------------------
+# OPENAI TEST ENDPOINT
+# ------------------------------------------------------------------------------------
+
 
 @app.get("/test_openai")
 def test_openai():
     try:
         response = client.chat.completions.create(
             model="gpt-5.1",
-            messages=[{"role": "user", "content": "Hello"}]
+            messages=[{"role": "user", "content": "Hello"}],
         )
         return {"status": "ok", "reply": response.choices[0].message.content}
     except Exception as e:
         return {"status": "error", "error": str(e)}
-
 
 # ------------------------------------------------------------------------------------
 # END OF FILE
