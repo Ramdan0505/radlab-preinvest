@@ -8,7 +8,7 @@ import subprocess
 from pathlib import Path
 from typing import Any, Dict
 
-from fastapi import FastAPI, UploadFile, BackgroundTasks, Body
+from fastapi import FastAPI, UploadFile, BackgroundTasks, Body, Query
 from fastapi.responses import JSONResponse, HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -149,12 +149,21 @@ def ingest_text(body: Dict[str, Any] = Body(...)):
 # ------------------------------------------------------------------------------------
 
 
-@app.get("/", response_class=HTMLResponse)
-async def serve_ui():
-    ui_path = os.path.join(static_dir, "rag_console.html")
-    if not os.path.exists(ui_path):
-        return HTMLResponse("<h1>UI missing</h1>", status_code=500)
-    return Path(ui_path).read_text(encoding="utf-8")
+@app.get("/search")
+def search_get(
+    case_id: str,
+    q: str,
+    top_k: int = 5,
+    include_metadata: bool = Query(True),
+):
+    try:
+        out = semantic_search(case_id, q, top_k)
+        if not include_metadata:
+            for r in out.get("results", []):
+                r.pop("metadata", None)
+        return out
+    except Exception as e:
+        return JSONResponse(status_code=500, content={"error": str(e)})
 
 # ------------------------------------------------------------------------------------
 # SEARCH ENDPOINTS
@@ -165,6 +174,7 @@ class SearchRequest(BaseModel):
     case_id: str
     query: str
     top_k: int = 5
+    include_metadata: bool = True
 
 
 @app.get("/search")
@@ -178,9 +188,16 @@ def search_get(case_id: str, q: str, top_k: int = 5):
 @app.post("/search")
 def search_post(req: SearchRequest):
     try:
-        return semantic_search(req.case_id, req.query, req.top_k)
+        out = semantic_search(req.case_id, req.query, req.top_k)
+
+        if not req.include_metadata:
+            for r in out.get("results", []):
+                r.pop("metadata", None)
+
+        return out
     except Exception as e:
         return JSONResponse(status_code=500, content={"error": str(e)})
+
 
 # ------------------------------------------------------------------------------------
 # CASE LISTING
