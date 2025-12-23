@@ -71,8 +71,6 @@ def hash_file(path: str) -> str:
 def kick_extract_task(image_path: str, case_id: str) -> None:
     subprocess.Popen(
         [sys.executable, "/app/worker/extract_job.py", image_path, case_id],
-        stdout=subprocess.DEVNULL,
-        stderr=subprocess.DEVNULL,
     )
 
 
