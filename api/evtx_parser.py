@@ -68,8 +68,7 @@ def _get_children(parent: ET.Element, tag: str, ns: Dict[str, str]) -> List[ET.E
 
 def iter_evtx_events(evtx_path: str) -> Generator[Dict[str, Any], None, None]:
     """
-    Iterate over *filtered* events in an EVTX file and yield normalized dicts.
-
+    Iterate over filtered events in an EVTX file and yield normalized dicts.
     Only returns DFIR-relevant Event IDs listed in INTERESTING_EVENT_IDS.
     """
     with Evtx(evtx_path) as log:
@@ -78,7 +77,6 @@ def iter_evtx_events(evtx_path: str) -> Generator[Dict[str, Any], None, None]:
                 xml_str = record.xml()
                 root = ET.fromstring(xml_str)
             except Exception:
-                # Corrupt record / parsing error: just skip
                 continue
 
             ns = _get_nsmap(root)
@@ -88,7 +86,7 @@ def iter_evtx_events(evtx_path: str) -> Generator[Dict[str, Any], None, None]:
                 continue
 
             event_id_el = _get_child(system, "EventID", ns)
-            if event_id_el is None or not event_id_el.text:
+            if event_id_el is None or not (event_id_el.text or "").strip():
                 continue
 
             try:
@@ -104,10 +102,18 @@ def iter_evtx_events(evtx_path: str) -> Generator[Dict[str, Any], None, None]:
             timestamp = time_el.get("SystemTime") if time_el is not None else None
 
             computer_el = _get_child(system, "Computer", ns)
-            computer = computer_el.text.strip() if computer_el is not None and computer_el.text else None
+            computer = (
+                computer_el.text.strip()
+                if computer_el is not None and computer_el.text
+                else None
+            )
 
             channel_el = _get_child(system, "Channel", ns)
-            channel = channel_el.text.strip() if channel_el is not None and channel_el.text else None
+            channel = (
+                channel_el.text.strip()
+                if channel_el is not None and channel_el.text
+                else None
+            )
 
             # EventData → {Name: value}
             data: Dict[str, Any] = {}
@@ -118,17 +124,20 @@ def iter_evtx_events(evtx_path: str) -> Generator[Dict[str, Any], None, None]:
                     value = d.text.strip() if d.text else ""
                     data[name] = value
 
-        # We skip record number for now to avoid python-evtx incompatibilities
-    rec_no = None
+            # Record number (python-evtx supports record_num())
+            try:
+                rec_no = record.record_num()
+            except Exception:
+                rec_no = None
 
-    yield {
-        "record_number": rec_no,
-        "event_id": event_id,
-        "timestamp": timestamp,
-        "computer": computer,
-        "channel": channel,
-        "data": data,
-    }
+            yield {
+                "record_number": rec_no,
+                "event_id": event_id,
+                "timestamp": timestamp,
+                "computer": computer,
+                "channel": channel,
+                "data": data,
+            }
 
 
 
