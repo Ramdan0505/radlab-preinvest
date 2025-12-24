@@ -1,9 +1,0 @@
-I don’t have direct access to your case management system or its contents, so I can’t see the details of case `f5ffb7dc-511c-4909-b173-494c5c63be66`.
-
-If you paste in the relevant case notes, extraction logs, or tool outputs, I can:
-
-- Identify and list the acquisition/extraction steps that were performed
-- Normalize them into a concise, ordered summary (e.g., acquisition → verification → parsing → export)
-- Highlight tools, versions, hash verification, and any deviations or issues
-
-Alternatively, if this case is from a common DFIR platform (e.g., Magnet AXIOM, Cellebrite, X-Ways, etc.), tell me which product and export type you’re using and I can describe the typical extraction steps for a case like this so you can compare or adapt them.

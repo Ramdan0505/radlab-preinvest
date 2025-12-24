@@ -1,9 +1,0 @@
-I don’t have direct access to your case repository or internal tracking system, so I can’t look up “case 948721d0-b71a-4b04-858c-9a3cb19d5d26” or see its specific extraction workflow.
-
-If you paste in the case notes, tool logs, or extraction playbook for that case (or describe what evidence types were handled—e.g., Windows disk image, iOS device, cloud artifacts), I can:
-
-- Summarize the exact extraction steps that were taken, in order.
-- Distill them into a concise checklist or SOP-style outline.
-- Highlight tools used, acquisition methods (live vs dead-box), and verification steps (hashing, chain-of-custody, etc.).
-
-Provide any relevant text or screenshots, and I’ll produce a precise summary tailored to that case.

@@ -9,7 +9,7 @@ import re
 import requests
 from pathlib import Path
 from datetime import datetime
-from embedder import embed_texts
+from api.embedder import embed_texts
 
 # -------------------------------------------------------
 # NEW: Load env + OpenAI client

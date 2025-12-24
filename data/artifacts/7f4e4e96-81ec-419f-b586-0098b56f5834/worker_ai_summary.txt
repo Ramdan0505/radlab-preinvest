@@ -1,8 +1,0 @@
-I don’t have access to your internal case repository or any prior context about case ID `7f4e4e96-81ec-419f-b586-0098b56f5834`, so I can’t see its specific extraction steps.
-
-If you paste in:
-
-- The case worksheet or notes, or  
-- The relevant section of your forensic log / playbook for that case,
-
-I can condense it into a concise, step‑by‑step extraction summary (including tools used, acquisition type, hashing, verification steps, and any deviations from SOP).
