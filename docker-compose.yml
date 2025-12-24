@@ -18,6 +18,7 @@ services:
       - .env                            # Loads OPENAI_API_KEY, others
     environment:
       ARTIFACT_DIR: /data/artifacts     # Keeps artifacts in persistent storage
+      SEARCH_MAX_DISTANCE: "1.2"
     depends_on:
       - chroma
     restart: unless-stopped
