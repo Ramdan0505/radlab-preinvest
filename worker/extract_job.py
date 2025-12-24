@@ -241,9 +241,7 @@ def parse_registry(out_dir):
 
 
 
-def build_embedding_index(out_dir, case_id):
-    # unchanged…
-    pass
+
 
 
 # ----------------------- main --------------------------
