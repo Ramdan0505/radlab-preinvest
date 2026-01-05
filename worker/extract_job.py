@@ -220,7 +220,6 @@ def main():
     parse_registry(out_dir)
     #triage_findings(out_dir)
     #rank_text_and_write_playbook(out_dir)
-    build_embedding_index(out_dir, case_id)
 
     print(f"[worker] Extraction complete for case: {case_id}")
 
