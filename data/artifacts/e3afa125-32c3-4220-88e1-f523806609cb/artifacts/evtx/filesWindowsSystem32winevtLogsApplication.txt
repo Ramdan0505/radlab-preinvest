@@ -1,1 +1,0 @@
-[2025-09-14 02:51:53.119114] EventID=15 Record=None Computer=Ramadan Channel=Application param1=86400 param2=SuppressDuplicateDuration param3=Software\Microsoft\EventSystem\EventLog

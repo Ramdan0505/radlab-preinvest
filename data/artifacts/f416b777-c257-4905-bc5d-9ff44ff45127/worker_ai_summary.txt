@@ -1,7 +1,0 @@
-I don’t have access to your internal case database or case f416b777-c257-4905-bc5d-9ff44ff45127, so I can’t see its specific extraction steps.
-
-If you paste the relevant case notes, triage log, or extraction worksheet for that case (or a redacted version), I can:
-
-- Distill the exact acquisition/extraction steps used (tools, modes, options, hashes, timestamps).
-- Organize them into a concise, ordered summary suitable for reporting or chain‑of‑custody documentation.
-- Highlight any gaps or ambiguities you may want to address.

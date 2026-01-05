@@ -1,1 +1,0 @@
-[2025-12-10 19:58:49.722765] EventID=4100 Record=None Computer=Ramadan Channel=Microsoft-Windows-PowerShell/Operational MessageNumber=1 MessageTotal=1 ScriptBlockText=Set-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell" -Name "ScriptBlockLogging" -Value 1 ScriptBlockId=5801e50f-6a0c-49d5-8a5e-77a499d6017f

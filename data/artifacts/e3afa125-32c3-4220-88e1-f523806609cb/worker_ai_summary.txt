@@ -1,9 +1,0 @@
-I don’t have access to your internal case system, so I can’t look up case `e3afa125-32c3-4220-88e1-f523806609cb` or its specific extraction log.
-
-If you paste in the extraction notes, tool output, or a timeline for that case, I can:
-
-- Condense it into a clear step‑by‑step extraction summary  
-- Distinguish between acquisition, verification, parsing, and export steps  
-- Highlight any anomalies, errors, or deviations from SOPs  
-
-Without that data, I can only describe a generic DFIR extraction workflow (e.g., identification → acquisition → verification → parsing → export), but that wouldn’t be specific to your case ID.

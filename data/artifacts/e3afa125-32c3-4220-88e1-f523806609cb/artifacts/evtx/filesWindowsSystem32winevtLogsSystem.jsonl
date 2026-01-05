@@ -1,1 +1,0 @@
-{"record_number": null, "event_id": 16, "timestamp": "2025-09-12 18:54:45.524410", "computer": "WIN-DAOI7R3U9SA", "channel": "System", "data": {"ServiceName": "Printer Extensions and Notifications", "ImagePath": "%SystemRoot%\\system32\\svchost.exe -k print", "ServiceType": "user mode service", "StartType": "demand start", "AccountName": "LocalSystem"}}

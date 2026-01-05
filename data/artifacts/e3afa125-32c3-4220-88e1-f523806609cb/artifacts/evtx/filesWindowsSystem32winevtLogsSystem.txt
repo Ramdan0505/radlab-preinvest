@@ -1,1 +1,0 @@
-[2025-09-12 18:54:45.524410] EventID=16 Record=None Computer=WIN-DAOI7R3U9SA Channel=System ServiceName=Printer Extensions and Notifications ImagePath=%SystemRoot%\system32\svchost.exe -k print ServiceType=user mode service StartType=demand start AccountName=LocalSystem

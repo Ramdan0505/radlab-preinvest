@@ -1,0 +1,11 @@
+{
+  "case_id": "9faf5d4e-f3f6-4342-bc80-411cac4ebb1a",
+  "source": "text",
+  "created_utc": "2026-01-05T15:41:20Z",
+  "text_preview": "Multiple failed login attempts followed by a successful login.",
+  "metadata": {
+    "source": "ui-test",
+    "category": "authentication",
+    "severity": "medium"
+  }
+}

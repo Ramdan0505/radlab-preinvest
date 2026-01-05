@@ -1,7 +1,0 @@
-I don’t have access to your internal case management system or its contents, so I can’t see the specific details for case `7c537f99-fd22-453d-8fc4-64387b0a33f1`.
-
-If you can provide either:
-- the existing notes/log for the extraction phase of that case, or  
-- a brief description of the acquisition sources (e.g., “Windows 10 laptop via FTK Imager and GrayKey, plus O365 mailbox export”),
-
-I can then summarize the extraction steps in a concise, case-ready format.
