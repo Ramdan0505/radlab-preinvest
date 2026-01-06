@@ -1,9 +1,0 @@
-I don’t have access to your internal case management system or its contents, so I can’t see what “case 6adea071-5375-41bf-98b3-209ee783d5c2” refers to or what was done in it.
-
-If you paste in (or describe) the extraction-related notes/logs for that case (e.g., tool output, examiner notes, or timeline of actions), I can then:
-
-- Identify and list the extraction steps performed
-- Normalize them into a concise sequence (e.g., acquisition → verification → parsing → export)
-- Highlight tools, evidence types, and key parameters used
-
-Share whatever level of detail you can (even redacted), and I’ll turn it into a clean summary of the extraction steps.

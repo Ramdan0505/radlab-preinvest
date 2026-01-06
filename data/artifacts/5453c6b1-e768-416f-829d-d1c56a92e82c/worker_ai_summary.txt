@@ -1,9 +1,0 @@
-I don’t have access to your internal case management system or its contents, so I can’t see what case `5453c6b1-e768-416f-829d-d1c56a92e82c` refers to or what extraction steps were recorded there.
-
-If you paste in (or upload) the relevant case notes, logs, or a timeline for that case, I can:
-
-- Extract and list the acquisition/extraction steps in order.
-- Normalize them into a concise, repeatable procedure (tools, commands, options, hashes, storage locations).
-- Highlight any deviations from standard DFIR acquisition practices.
-
-Alternatively, tell me what artifacts or sources were acquired (e.g., “Windows 10 laptop via dead-box imaging and logical triage,” “M365 mailbox export,” “Android handset via Cellebrite,” etc.), and I can reconstruct a minimal step‑by‑step summary aligned with common DFIR workflows.
