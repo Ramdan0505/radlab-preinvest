@@ -1,7 +1,4 @@
-version: "3.9"
-
 services:
-
   # -------------------------------------------------------
   # FASTAPI BACKEND (Main DFIR API)
   # -------------------------------------------------------
@@ -15,42 +12,59 @@ services:
       - ./data:/data                    # DFIR artifacts
       - ./static:/app/static            # UI assets
     env_file:
-      - .env                            # Loads OPENAI_API_KEY, others
+      - .env
     environment:
-      ARTIFACT_DIR: /data/artifacts     # Keeps artifacts in persistent storage
-      SEARCH_MAX_DISTANCE: "0.70"
+      ARTIFACT_DIR: /data/artifacts
       CHROMA_HOST: chroma
-      CHROMA_PORT: 8000
+      CHROMA_PORT: "8000"
+
+      # Demo tuning: stricter threshold => nonsense queries return []
+      # If you want more results, raise this (e.g., 0.70).
+      SEARCH_MAX_DISTANCE: "0.60"
     depends_on:
       - chroma
     restart: unless-stopped
 
 
   # -------------------------------------------------------
-  # WORKER SERVICE (for extraction + background jobs)
+  # WORKER SERVICE (extraction + background jobs)
   # -------------------------------------------------------
   worker:
     build:
       context: .
       dockerfile: worker/Dockerfile
     volumes:
-      - ./data:/data                    # Worker reads/writes DFIR case data
+      - ./data:/data
     env_file:
-      - .env                            # Worker also needs access to API key
+      - .env
+    environment:
+      ARTIFACT_DIR: /data/artifacts
+
+      # Worker posts back to the API internally
+      API_URL: http://api:8000
+
+      # Keep worker+api consistent when embedding/indexing
+      CHROMA_HOST: chroma
+      CHROMA_PORT: "8000"
+      SEARCH_MAX_DISTANCE: "0.60"
     depends_on:
+      - api
       - chroma
     restart: unless-stopped
 
 
   # -------------------------------------------------------
-  # CHROMA VECTOR DATABASE (Embeddings + RAG Index)
+  # CHROMA VECTOR DATABASE
   # -------------------------------------------------------
   chroma:
-    image: ghcr.io/chroma-core/chroma:latest
+    # RECOMMENDED: pin the version for stability
+    # If you're currently on 0.5.3, keep 0.5.3.
+    # Avoid :latest for demos.
+    image: ghcr.io/chroma-core/chroma:0.5.3
     ports:
-      - "8001:8000"                     # Expose only for debugging
+      - "8001:8000"                     # expose for debugging
     volumes:
-      - ./chroma:/data                  # Persistent vector database
+      - ./chroma:/data
     restart: unless-stopped
 
 
@@ -64,8 +78,8 @@ services:
       MINIO_ROOT_USER: minioadmin
       MINIO_ROOT_PASSWORD: minioadmin
     ports:
-      - "9000:9000"                     # S3 API
-      - "9001:9001"                     # MinIO Console UI
+      - "9000:9000"
+      - "9001:9001"
     volumes:
-      - ./minio:/data                   # Persist object storage
+      - ./minio:/data
     restart: unless-stopped
