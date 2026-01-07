@@ -7,10 +7,29 @@ from typing import Dict, Any, Generator, List, Optional
 from Evtx.Evtx import Evtx
 
 INTERESTING_EVENT_IDS = {
-    4624, 4625, 4634, 4648, 4672, 4688, 4689,
-    4720, 4722, 4725, 4728, 4732, 4735, 4740,
-    4768, 4769, 4776, 7045, 4103, 4104
+    # Authentication / logon
+    4624, 4625, 4634, 4648, 4672, 4768, 4769, 4776, 4740,
+
+    # Process creation / exit (if present)
+    4688, 4689,
+
+    # Account and group changes
+    4720, 4722, 4725, 4728, 4732, 4735,
+
+    # Services
+    7000, 7001, 7009, 7011, 7022, 7023, 7024, 7026, 7031, 7034, 7035, 7036, 7040, 7045,
+
+    # Boot / shutdown / eventlog service
+    12, 13,          # Kernel-General boot/shutdown markers
+    6005, 6006, 6008, 6009, 6011, 6013,  # EventLog + unexpected shutdown + name change (6011) etc.
+
+    # Windows setup (common)
+    2004, 2005,
+
+    # PowerShell
+    4100, 4103, 4104,
 }
+
 
 
 def _get_nsmap(root: ET.Element) -> Dict[str, str]:
