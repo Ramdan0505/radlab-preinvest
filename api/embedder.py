@@ -13,20 +13,17 @@ CHROMA_HOST = os.getenv("CHROMA_HOST", "chroma")  # docker-compose service name
 CHROMA_PORT = int(os.getenv("CHROMA_PORT", "8000"))
 
 # Cosine distance threshold: 0 = identical, ~1 = very far
-# Tune this. Good starting point: 0.60–0.75
+# Start stricter for demos (0.55–0.65). Loosen only if too many empty results.
 SEARCH_MAX_DISTANCE = float(os.getenv("SEARCH_MAX_DISTANCE", "0.70"))
 
 
 def _make_client():
     """
-    Prefer Chroma server, but allow fallback to local PersistentClient if server fails.
-    NOTE: If you see fallback logs, you're NOT using the chroma container.
+    In docker-compose you should ALWAYS talk to the chroma service.
+    Avoid falling back to PersistentClient('/data') because that creates a *different*
+    DB in your artifacts volume and causes confusing 'count=0' mismatches.
     """
-    try:
-        return chromadb.HttpClient(host=CHROMA_HOST, port=CHROMA_PORT)
-    except Exception as e:
-        print(f"[embedder] HttpClient failed ({e}); falling back to PersistentClient('/data').")
-        return chromadb.PersistentClient(path="/data")
+    return chromadb.HttpClient(host=CHROMA_HOST, port=CHROMA_PORT)
 
 
 _client = _make_client()
@@ -66,14 +63,20 @@ def semantic_search(case_id: str, query: str, top_k: int = 5) -> Dict[str, Any]:
     if not query:
         return {"results": []}
 
+    top_k = int(top_k or 5)
+    if top_k < 1:
+        top_k = 5
+
     coll = _get_collection(case_id)
 
     q_emb = _model.encode([query], normalize_embeddings=True)[0].tolist()
 
+    # IMPORTANT (Chroma 0.5.3):
+    # include cannot contain "ids" — ids come back automatically.
     res = coll.query(
         query_embeddings=[q_emb],
         n_results=top_k,
-        include=["documents", "metadatas", "distances", "ids"],
+        include=["documents", "metadatas", "distances"],
     )
 
     hits = []
@@ -82,11 +85,13 @@ def semantic_search(case_id: str, query: str, top_k: int = 5) -> Dict[str, Any]:
     docs0 = (res.get("documents") or [[]])[0]
     metas0 = (res.get("metadatas") or [[]])[0]
 
-    for i in range(len(ids0)):
+    for i in range(min(len(ids0), len(dists0), len(docs0), len(metas0))):
         dist = dists0[i]
         if dist is None:
             continue
-        # KEY FIX: filter irrelevant results
+
+        # KEY: filter garbage matches.
+        # Without this, random queries will still return "nearest neighbors".
         if dist > SEARCH_MAX_DISTANCE:
             continue
 
