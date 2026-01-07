@@ -6,32 +6,36 @@ from typing import Dict, Any, Generator, List, Optional
 
 from Evtx.Evtx import Evtx
 
+# -----------------------------
+# Event IDs worth indexing
+# -----------------------------
 INTERESTING_EVENT_IDS = {
     # Authentication / logon
     4624, 4625, 4634, 4648, 4672, 4768, 4769, 4776, 4740,
 
-    # Process creation / exit (if present)
+    # Process lifecycle
     4688, 4689,
 
-    # Account and group changes
+    # Account & group changes
     4720, 4722, 4725, 4728, 4732, 4735,
 
     # Services
     7000, 7001, 7009, 7011, 7022, 7023, 7024, 7026, 7031, 7034, 7035, 7036, 7040, 7045,
 
-    # Boot / shutdown / eventlog service
-    12, 13,          # Kernel-General boot/shutdown markers
-    6005, 6006, 6008, 6009, 6011, 6013,  # EventLog + unexpected shutdown + name change (6011) etc.
+    # Boot / shutdown / system
+    12, 13,
+    6005, 6006, 6008, 6009, 6011, 6013,
 
-    # Windows setup (common)
+    # Setup
     2004, 2005,
 
     # PowerShell
     4100, 4103, 4104,
 }
 
-
-
+# -----------------------------
+# XML helpers
+# -----------------------------
 def _get_nsmap(root: ET.Element) -> Dict[str, str]:
     if root.tag.startswith("{"):
         uri = root.tag.split("}")[0].strip("{")
@@ -54,18 +58,18 @@ def _get_children(parent: ET.Element, tag: str, ns: Dict[str, str]) -> List[ET.E
             return els
     return parent.findall(tag)
 
-
+# -----------------------------
+# EVTX iteration
+# -----------------------------
 def iter_evtx_events(evtx_path: str) -> Generator[Dict[str, Any], None, None]:
     with Evtx(evtx_path) as log:
         for record in log.records():
             try:
-                xml_str = record.xml()
-                root = ET.fromstring(xml_str)
+                root = ET.fromstring(record.xml())
             except Exception:
                 continue
 
             ns = _get_nsmap(root)
-
             system = _get_child(root, "System", ns)
             if system is None:
                 continue
@@ -99,11 +103,10 @@ def iter_evtx_events(evtx_path: str) -> Generator[Dict[str, Any], None, None]:
                     value = (d.text or "").strip()
                     data[name] = value
 
-            rec_no = None
             try:
                 rec_no = record.record_num()
             except Exception:
-                pass
+                rec_no = None
 
             yield {
                 "record_number": rec_no,
@@ -114,14 +117,34 @@ def iter_evtx_events(evtx_path: str) -> Generator[Dict[str, Any], None, None]:
                 "data": data,
             }
 
-
+# -----------------------------
+# Text formatting for embeddings
+# -----------------------------
 def format_event_for_text(event: Dict[str, Any]) -> str:
     ts = event.get("timestamp") or "UNKNOWN_TIME"
     eid = event.get("event_id")
     rec = event.get("record_number")
     comp = event.get("computer") or ""
-    channel = event.get("channel") or ""
+    channel = (event.get("channel") or "").lower()
     data = event.get("data") or {}
+
+    tags = []
+
+    if "security" in channel:
+        tags.append("ChannelTag=security Category=authentication")
+    if "system" in channel:
+        tags.append("ChannelTag=system Category=system")
+    if "setup" in channel:
+        tags.append("ChannelTag=setup Category=setup")
+    if "powershell" in channel:
+        tags.append("ChannelTag=powershell Category=scripting")
+
+    if eid in {7040, 7045}:
+        tags.append("Category=service")
+    if eid in {4625}:
+        tags.append("Category=failed_logon")
+    if eid in {4624}:
+        tags.append("Category=successful_logon")
 
     clean = []
     for k, v in data.items():
@@ -130,9 +153,13 @@ def format_event_for_text(event: Dict[str, Any]) -> str:
             clean.append(f"{k}={s}")
 
     kv = " ".join(clean[:12])
-    return f"[{ts}] EventID={eid} Record={rec} Computer={comp} Channel={channel} {kv}".strip()
+    tag_str = " ".join(tags)
 
+    return f"[{ts}] EventID={eid} Record={rec} Computer={comp} Channel={channel} {tag_str} {kv}".strip()
 
+# -----------------------------
+# Derivative writer
+# -----------------------------
 def generate_evtx_derivatives(evtx_path: str, case_dir: str) -> Dict[str, Any]:
     os.makedirs(case_dir, exist_ok=True)
 
@@ -151,4 +178,8 @@ def generate_evtx_derivatives(evtx_path: str, case_dir: str) -> Dict[str, Any]:
             jf.write(json.dumps(event, ensure_ascii=False) + "\n")
             tf.write(format_event_for_text(event) + "\n")
 
-    return {"events_count": events_count, "jsonl_path": jsonl_path, "txt_path": txt_path}
+    return {
+        "events_count": events_count,
+        "jsonl_path": jsonl_path,
+        "txt_path": txt_path,
+    }
