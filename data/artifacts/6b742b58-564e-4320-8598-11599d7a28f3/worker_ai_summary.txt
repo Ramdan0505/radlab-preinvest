@@ -1,7 +1,0 @@
-I don’t have access to your internal case database or tooling, so I can’t look up case `6b742b58-564e-4320-8598-11599d7a28f3` directly.
-
-If you paste or upload the relevant extraction log, case notes, or a screenshot for that case, I can:
-
-- Identify and summarize the acquisition/extraction steps (tooling, source media, method, scope, hashes, verification).
-- Highlight any irregularities (retries, errors, fallbacks to different methods).
-- Produce a concise bullet-point summary suitable for inclusion in your DFIR report.

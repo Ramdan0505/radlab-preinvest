@@ -1,5 +1,0 @@
-[2025-09-12 18:59:43.589931] EventID=4625 Record=11 Computer=DESKTOP-7AQ11N8 Channel=application Category=failed_logon param1=86400 param2=SuppressDuplicateDuration param3=Software\Microsoft\EventSystem\EventLog
-[2025-09-12 16:11:15.737484] EventID=4625 Record=59 Computer=Rami Channel=application Category=failed_logon param1=86400 param2=SuppressDuplicateDuration param3=Software\Microsoft\EventSystem\EventLog
-[2025-09-14 01:18:27.592461] EventID=4625 Record=199 Computer=Rami Channel=application Category=failed_logon param1=86400 param2=SuppressDuplicateDuration param3=Software\Microsoft\EventSystem\EventLog
-[2025-09-14 01:55:24.492447] EventID=4625 Record=261 Computer=Ramadan Channel=application Category=failed_logon param1=86400 param2=SuppressDuplicateDuration param3=Software\Microsoft\EventSystem\EventLog
-[2025-09-14 02:51:53.119114] EventID=4625 Record=349 Computer=Ramadan Channel=application Category=failed_logon param1=86400 param2=SuppressDuplicateDuration param3=Software\Microsoft\EventSystem\EventLog
